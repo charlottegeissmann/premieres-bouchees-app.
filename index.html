@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Figtree:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --bg:#F5F1E6;
@@ -281,11 +284,54 @@
   }
 
   [hidden]{display:none!important;}
+
+  /* ---------- Auth gate ---------- */
+  .auth-gate{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:var(--bg);
+  }
+  .auth-card{
+    width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);
+    border-radius:20px;padding:28px 24px;box-shadow:var(--shadow);
+  }
+  .auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:22px;}
+  .auth-brand span{font-size:1.9rem;}
+  .auth-brand h1{font-size:1.35rem;text-align:center;}
+  .auth-loading{text-align:center;color:var(--ink-soft);font-size:.9rem;}
+  .auth-tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+  .auth-tab{
+    flex:1;padding:9px 6px;border:none;background:none;color:var(--ink-soft);
+    font-weight:600;font-size:.88rem;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+  }
+  .auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .auth-error{
+    background:var(--danger-soft);color:var(--danger);border-radius:10px;padding:9px 12px;
+    font-size:.82rem;margin-bottom:14px;
+  }
+  .auth-choice-btn{
+    width:100%;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--border);
+    background:var(--surface-2);cursor:pointer;margin-bottom:12px;color:var(--ink);
+  }
+  .auth-choice-btn .em{font-size:1.3rem;margin-right:8px;}
+  .auth-choice-btn strong{display:block;font-size:.95rem;margin-bottom:2px;}
+  .auth-choice-btn span.desc{font-size:.78rem;color:var(--ink-soft);}
+  .code-reveal{
+    text-align:center;font-family:var(--font-mono);font-size:1.7rem;font-weight:700;
+    letter-spacing:.12em;background:var(--accent-soft);color:var(--accent);border-radius:14px;
+    padding:16px;margin:16px 0;
+  }
 </style>
 </head>
 <body>
 
-<div id="app">
+<div id="authGate" class="auth-gate">
+  <div class="auth-card">
+    <div class="auth-brand"><span aria-hidden="true">🥄</span><h1>Premières Bouchées</h1></div>
+    <div id="authGateContent"><p class="auth-loading">Chargement…</p></div>
+  </div>
+</div>
+
+<div id="app" hidden>
   <header class="topbar">
     <div class="topbar-main">
       <div class="brand">
@@ -349,6 +395,17 @@
 <script>
 (function(){
   "use strict";
+
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDWNNMoYkY98tFK8QaND6synJ0assWjnPA",
+    authDomain: "premieres-bouchees.firebaseapp.com",
+    projectId: "premieres-bouchees",
+    storageBucket: "premieres-bouchees.firebasestorage.app",
+    messagingSenderId: "250399219020",
+    appId: "1:250399219020:web:1eb6ee318cf77cc3a343e9",
+    measurementId: "G-7PB14TJ49W"
+  };
+  firebase.initializeApp(FIREBASE_CONFIG);
 
   /* ================= DATA ================= */
   var CATEGORIES = [
@@ -559,7 +616,7 @@
   }
   function saveState(){
     saveStateLocalOnly();
-    scheduleGhSync();
+    schedulePush();
   }
 
   function allFoods(){
@@ -943,7 +1000,6 @@
   }
 
   function openSettingsSheet(){
-    var ghCfg = ghLoadConfig();
     openSheet(
       '<div class="sheet-title"><span class="em">⚙️</span><h2>Réglages</h2></div>'+
 
@@ -965,19 +1021,20 @@
       '</div>'+
 
       '<div class="settings-section">'+
-        '<h3>Synchronisation automatique (GitHub)</h3>'+
-        '<p class="sheet-sub" style="margin-top:-4px;">Vos coches sont automatiquement envoyées vers un petit dépôt GitHub privé, et récupérées à intervalle régulier — plus de code à copier. Les deux téléphones doivent utiliser le <strong>même dépôt</strong> et le <strong>même jeton</strong>.</p>'+
+        '<h3>Compte & famille</h3>'+
         '<div class="sync-box">'+
-          '<div class="field" style="margin-bottom:10px;"><label>Dépôt (propriétaire/dépôt)</label><input type="text" id="ghRepo" placeholder="ex. jbfoult/premieres-bouchees-data" value="'+(ghCfg.repo||"")+'"></div>'+
-          '<div class="field" style="margin-bottom:0;"><label>Jeton d\'accès (fine-grained, Contents: Read and write)</label><input type="password" id="ghToken" placeholder="github_pat_…" value="'+(ghCfg.token||"")+'"></div>'+
-          '<div class="sync-row" style="margin-top:10px;">'+
-            '<button class="btn primary" id="ghSaveBtn">'+(ghCfg.enabled?"Mettre à jour":"Activer")+'</button>'+
-            (ghCfg.enabled ? '<button class="btn" id="ghSyncNowBtn">Synchroniser maintenant</button>' : '')+
+          '<p class="sheet-sub" style="margin:0 0 8px;">Connecté en tant que <strong>'+((auth.currentUser&&auth.currentUser.email)||"—")+'</strong></p>'+
+          '<label style="font-size:.75rem;font-weight:700;color:var(--ink-soft);">Code de famille</label>'+
+          '<div class="sync-row" style="margin-top:6px;">'+
+            '<input type="text" id="familyCodeDisplay" readonly value="'+familyCode()+'" style="font-family:var(--font-mono);letter-spacing:.06em;">'+
+            '<button class="btn" id="copyFamilyCodeBtn">Copier</button>'+
           '</div>'+
-          (ghCfg.enabled ? '<div class="sync-row"><button class="btn ghost" id="ghDisableBtn" style="color:var(--danger);">Désactiver sur cet appareil</button></div>' : '')+
-          '<p id="ghStatusLine" style="font-size:.78rem;margin:10px 0 0;">'+ghStatusHtml()+'</p>'+
+          '<p id="syncStatusLine" style="font-size:.78rem;margin:10px 0 0;">'+syncStatusHtml()+'</p>'+
+          '<div class="sync-row" style="margin-top:10px;">'+
+            '<button class="btn ghost" id="signOutBtn" style="color:var(--danger);">Se déconnecter</button>'+
+          '</div>'+
         '</div>'+
-        '<p class="sheet-sub" style="margin:8px 0 0;">Pas encore de dépôt ? Sur GitHub : créez un dépôt privé en cochant « Add a README file », puis Settings → Developer settings → Fine-grained tokens → générez-en un limité à ce seul dépôt, permission « Contents: Read and write ». Collez le même jeton sur les deux téléphones — il reste stocké uniquement dans le navigateur de chaque appareil, jamais envoyé ailleurs.</p>'+
+        '<p class="sheet-sub" style="margin:8px 0 0;">Partagez ce code avec votre conjoint·e pour qu\'il/elle rejoigne la même famille depuis Réglages au premier lancement.</p>'+
       '</div>'+
 
       '<div class="settings-section">'+
@@ -1011,30 +1068,14 @@
           showToast("Réglages enregistrés");
         });
 
-        document.getElementById("ghSaveBtn").addEventListener("click", function(){
-          var repo = document.getElementById("ghRepo").value.trim();
-          var token = document.getElementById("ghToken").value.trim();
-          if(!repo || !repo.includes("/")){ showToast("Format attendu : propriétaire/dépôt"); return; }
-          if(!token){ showToast("Collez votre jeton d'accès"); return; }
-          ghSaveConfig({repo:repo, token:token, enabled:true});
-          showToast("Synchronisation activée");
-          runGhSync().then(function(){ openSettingsSheet(); });
+        document.getElementById("copyFamilyCodeBtn").addEventListener("click", function(){
+          var code = familyCode();
+          if(navigator.clipboard) navigator.clipboard.writeText(code).then(function(){ showToast("Code copié"); });
         });
-        var syncNowBtn = document.getElementById("ghSyncNowBtn");
-        if(syncNowBtn) syncNowBtn.addEventListener("click", function(){
-          runGhSync().then(function(){
-            var el = document.getElementById("ghStatusLine");
-            if(el) el.innerHTML = ghStatusHtml();
-          });
-        });
-        var disableBtn = document.getElementById("ghDisableBtn");
-        if(disableBtn) disableBtn.addEventListener("click", function(){
-          if(confirm("Désactiver la synchronisation automatique sur cet appareil ? Le dépôt GitHub n'est pas supprimé.")){
-            var cfg = ghLoadConfig();
-            cfg.enabled = false;
-            ghSaveConfig(cfg);
-            showToast("Synchronisation désactivée");
-            openSettingsSheet();
+        document.getElementById("signOutBtn").addEventListener("click", function(){
+          if(confirm("Se déconnecter sur cet appareil ?")){
+            closeSheet();
+            signOutUser();
           }
         });
 
@@ -1142,151 +1183,124 @@
     return {ok:true, count: mergeIncoming(data)};
   }
 
-  /* ---------- Synchronisation automatique (GitHub) ---------- */
-  var GH_KEY = "pb_gh_v1";
-  var GH_PATH = "data.json";
-  var ghSyncTimer = null;
-  var ghStatus = {state:"idle", message:"", lastSyncAt:""}; // idle | syncing | ok | error
-
-  function ghLoadConfig(){
-    try{
-      var raw = localStorage.getItem(GH_KEY);
-      return raw ? JSON.parse(raw) : {repo:"", token:"", enabled:false};
-    }catch(e){ return {repo:"", token:"", enabled:false}; }
-  }
-  function ghSaveConfig(cfg){
-    try{ localStorage.setItem(GH_KEY, JSON.stringify(cfg)); }catch(e){}
-  }
-
-  function ghHeaders(token){
-    return {
-      "Authorization": "Bearer " + token,
-      "Accept": "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "Content-Type": "application/json"
-    };
-  }
-
-  function ghFileUrl(repo){
-    return "https://api.github.com/repos/" + repo + "/contents/" + GH_PATH;
-  }
-
-  // Récupère le fichier distant : {content, sha} ou {content:null, sha:null} s'il n'existe pas encore.
-  function ghGetFile(cfg){
-    return fetch(ghFileUrl(cfg.repo), {headers: ghHeaders(cfg.token)}).then(function(res){
-      if(res.status===404) return {content:null, sha:null};
-      if(!res.ok) return res.json().catch(function(){return {};}).then(function(body){
-        throw new Error(ghErrorMessage(res.status, body));
-      });
-      return res.json().then(function(json){
-        var raw = (json.content||"").replace(/\n/g,"");
-        var data = null;
-        try{ data = JSON.parse(b64decode(raw)); }catch(e){ data = null; }
-        return {content:data, sha:json.sha};
-      });
-    });
-  }
-
-  function ghPutFile(cfg, dataObj, sha){
-    var body = {
-      message: "Synchro Premières Bouchées",
-      content: b64encode(JSON.stringify(dataObj))
-    };
-    if(sha) body.sha = sha;
-    return fetch(ghFileUrl(cfg.repo), {method:"PUT", headers: ghHeaders(cfg.token), body: JSON.stringify(body)})
-      .then(function(res){
-        if(res.status===409) return "conflict";
-        if(!res.ok) return res.json().catch(function(){return {};}).then(function(errBody){
-          throw new Error(ghErrorMessage(res.status, errBody));
-        });
-        return "ok";
-      });
-  }
-
-  function ghErrorMessage(status, body){
-    if(status===401) return "Jeton invalide ou expiré.";
-    if(status===403) return "Accès refusé (permissions du jeton ou limite atteinte).";
-    if(status===404) return "Dépôt introuvable — vérifiez le nom (propriétaire/dépôt).";
-    if(status===422) return "Le dépôt est vide (ajoutez un fichier README pour l'initialiser) ou requête invalide.";
-    return (body && body.message) ? body.message : ("Erreur GitHub (" + status + ")");
-  }
-
-  function setGhStatus(state, message){
-    ghStatus.state = state;
-    ghStatus.message = message || "";
-    if(state==="ok") ghStatus.lastSyncAt = nowIso();
-    var el = document.getElementById("ghStatusLine");
-    if(el) el.innerHTML = ghStatusHtml();
-  }
-
-  function ghStatusHtml(){
-    if(ghStatus.state==="syncing") return "⏳ Synchronisation…";
-    if(ghStatus.state==="error") return '<span style="color:var(--danger);">⚠️ '+ghStatus.message+'</span>';
-    if(ghStatus.state==="ok" && ghStatus.lastSyncAt){
-      var d = new Date(ghStatus.lastSyncAt);
-      var hh = String(d.getHours()).padStart(2,"0"), mm = String(d.getMinutes()).padStart(2,"0");
-      return '<span style="color:var(--ok);">✓ Synchronisé à '+hh+':'+mm+'</span>';
-    }
-    return "Pas encore synchronisé";
-  }
-
-  // Un cycle complet : on récupère le distant, on fusionne dans le local, puis on renvoie
-  // l'état fusionné au distant (avec une reprise si le fichier a changé entre-temps).
-  // Empreinte du contenu suivi (hors horodatage d'export) : sert à éviter de renvoyer
-  // un commit GitHub identique à chaque cycle quand rien n'a réellement changé.
+  /* ---------- Compte & famille (Firebase) ---------- */
+  var FAMILY_KEY = "pb_family_v1";
+  var auth = firebase.auth();
+  var db = firebase.firestore();
+  var familyUnsub = null;
+  var syncStatus = {state:"idle", message:"", lastSyncAt:""}; // idle | syncing | ok | error
   var lastPushedFingerprint = null;
+  var pushTimer = null;
+
   function payloadFingerprint(){
     return JSON.stringify({foods:state.foods, allergens:state.allergens, customFoods:state.customFoods, baby:state.baby, parents:state.parents});
   }
 
-  function runGhSync(){
-    var cfg = ghLoadConfig();
-    if(!cfg.enabled || !cfg.repo || !cfg.token) return Promise.resolve();
-    setGhStatus("syncing");
-    return ghGetFile(cfg).then(function(remote){
-      if(remote.content) mergeIncoming(remote.content);
-      saveStateLocalOnly();
-      renderAll();
-      var fp = payloadFingerprint();
-      if(fp === lastPushedFingerprint && remote.sha){
-        return "skip";
+  function familyCode(){
+    try{ return localStorage.getItem(FAMILY_KEY) || ""; }catch(e){ return ""; }
+  }
+  function setFamilyCodeLocal(code){
+    try{ localStorage.setItem(FAMILY_KEY, code); }catch(e){}
+  }
+  function clearFamilyCodeLocal(){
+    try{ localStorage.removeItem(FAMILY_KEY); }catch(e){}
+  }
+  function familyDocRef(code){ return db.collection("families").doc(code); }
+  function generateFamilyCode(){
+    var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans O/0, I/1 pour éviter les confusions
+    var code = "";
+    for(var i=0;i<8;i++) code += chars[Math.floor(Math.random()*chars.length)];
+    return code;
+  }
+
+  function setSyncStatus(s, message){
+    syncStatus.state = s;
+    syncStatus.message = message || "";
+    if(s==="ok") syncStatus.lastSyncAt = nowIso();
+    var el = document.getElementById("syncStatusLine");
+    if(el) el.innerHTML = syncStatusHtml();
+  }
+  function syncStatusHtml(){
+    if(syncStatus.state==="syncing") return "⏳ Synchronisation…";
+    if(syncStatus.state==="error") return '<span style="color:var(--danger);">⚠️ '+syncStatus.message+'</span>';
+    if(syncStatus.state==="ok" && syncStatus.lastSyncAt){
+      var d = new Date(syncStatus.lastSyncAt);
+      var hh = String(d.getHours()).padStart(2,"0"), mm = String(d.getMinutes()).padStart(2,"0");
+      return '<span style="color:var(--ok);">✓ Synchronisé à '+hh+':'+mm+'</span>';
+    }
+    return "En attente…";
+  }
+
+  // Écoute en temps réel le document de la famille : toute modification faite par
+  // l'autre parent (ou sur un autre appareil) arrive ici et se fusionne dans l'état local.
+  function connectToFamily(code){
+    if(familyUnsub) familyUnsub();
+    setSyncStatus("syncing");
+    familyUnsub = familyDocRef(code).onSnapshot(function(snap){
+      if(snap.exists){
+        mergeIncoming(snap.data());
+        saveStateLocalOnly();
+        renderAll();
       }
-      return ghPutFile(cfg, buildPayload(), remote.sha).then(function(result){
-        if(result==="conflict"){
-          return ghGetFile(cfg).then(function(remote2){
-            if(remote2.content) mergeIncoming(remote2.content);
-            saveStateLocalOnly();
-            renderAll();
-            var fp2 = payloadFingerprint();
-            return ghPutFile(cfg, buildPayload(), remote2.sha).then(function(r2){
-              if(r2==="ok") lastPushedFingerprint = fp2;
-              return r2;
-            });
-          });
-        }
-        if(result==="ok") lastPushedFingerprint = fp;
-        return result;
-      });
-    }).then(function(){
-      setGhStatus("ok");
-    }).catch(function(err){
-      setGhStatus("error", err.message || "Erreur de synchronisation");
+      setSyncStatus("ok");
+    }, function(err){
+      setSyncStatus("error", err.message || "Connexion perdue");
     });
   }
 
-  function scheduleGhSync(){
-    var cfg = ghLoadConfig();
-    if(!cfg.enabled) return;
-    clearTimeout(ghSyncTimer);
-    ghSyncTimer = setTimeout(runGhSync, 1500);
+  function pushToFamily(){
+    var code = familyCode();
+    if(!code) return;
+    var fp = payloadFingerprint();
+    if(fp === lastPushedFingerprint) return;
+    setSyncStatus("syncing");
+    familyDocRef(code).set(buildPayload()).then(function(){
+      lastPushedFingerprint = fp;
+      setSyncStatus("ok");
+    }).catch(function(err){
+      setSyncStatus("error", err.message || "Erreur de synchronisation");
+    });
   }
 
-  document.addEventListener("visibilitychange", function(){
-    if(!document.hidden) scheduleGhSync();
-  });
-  setInterval(function(){
-    if(!document.hidden) scheduleGhSync();
-  }, 25000);
+  function schedulePush(){
+    if(!familyCode()) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushToFamily, 800);
+  }
+
+  function createFamily(){
+    var code = generateFamilyCode();
+    return familyDocRef(code).set(buildPayload()).then(function(){
+      setFamilyCodeLocal(code);
+      lastPushedFingerprint = payloadFingerprint();
+      connectToFamily(code);
+      return code;
+    });
+  }
+
+  function joinFamily(rawCode){
+    var code = rawCode.trim().toUpperCase().replace(/\s+/g,"");
+    return familyDocRef(code).get().then(function(snap){
+      if(!snap.exists) throw new Error("Code introuvable — vérifiez-le auprès de votre conjoint·e.");
+      mergeIncoming(snap.data());
+      saveStateLocalOnly();
+      renderAll();
+      setFamilyCodeLocal(code);
+      lastPushedFingerprint = payloadFingerprint();
+      return familyDocRef(code).set(buildPayload()).then(function(){
+        connectToFamily(code);
+        return code;
+      });
+    });
+  }
+
+  function signUp(email, password){ return auth.createUserWithEmailAndPassword(email, password); }
+  function signIn(email, password){ return auth.signInWithEmailAndPassword(email, password); }
+  function signOutUser(){
+    if(familyUnsub) familyUnsub();
+    familyUnsub = null;
+    return auth.signOut();
+  }
 
   /* ================= TOAST ================= */
   var toastTimer;
@@ -1333,8 +1347,119 @@
     renderAllergens();
   }
 
-  renderAll();
-  if(ghLoadConfig().enabled) runGhSync();
+  /* ================= AUTH GATE ================= */
+  var authGateEl = document.getElementById("authGate");
+  var authGateContent = document.getElementById("authGateContent");
+  var appEl = document.getElementById("app");
+  var authMode = "signin"; // signin | signup
+
+  function showApp(){ authGateEl.hidden = true; appEl.hidden = false; }
+  function showGate(){ authGateEl.hidden = false; appEl.hidden = true; }
+
+  function showAuthError(msg){
+    var el = document.getElementById("authError");
+    if(el) el.innerHTML = '<div class="auth-error">'+msg+'</div>';
+  }
+  function authErrorMessage(err){
+    var code = err && err.code;
+    if(code==="auth/email-already-in-use") return "Cet email a déjà un compte — essayez « Se connecter ».";
+    if(code==="auth/invalid-email") return "Adresse email invalide.";
+    if(code==="auth/weak-password") return "Mot de passe trop court (6 caractères minimum).";
+    if(code==="auth/wrong-password" || code==="auth/user-not-found" || code==="auth/invalid-credential") return "Email ou mot de passe incorrect.";
+    return (err && err.message) || "Erreur inconnue.";
+  }
+
+  function renderAuthForm(){
+    authGateContent.innerHTML =
+      '<div class="auth-tabs">'+
+        '<button class="auth-tab'+(authMode==="signin"?" active":"")+'" data-mode="signin">Se connecter</button>'+
+        '<button class="auth-tab'+(authMode==="signup"?" active":"")+'" data-mode="signup">Créer un compte</button>'+
+      '</div>'+
+      '<div id="authError"></div>'+
+      '<div class="field"><label>Email</label><input type="email" id="authEmail" autocomplete="email"></div>'+
+      '<div class="field"><label>Mot de passe</label><input type="password" id="authPassword" autocomplete="'+(authMode==="signup"?"new-password":"current-password")+'"></div>'+
+      '<button class="btn primary" id="authSubmitBtn" style="width:100%;">'+(authMode==="signin"?"Se connecter":"Créer mon compte")+'</button>';
+
+    authGateContent.querySelectorAll(".auth-tab").forEach(function(tab){
+      tab.addEventListener("click", function(){
+        authMode = tab.getAttribute("data-mode");
+        renderAuthForm();
+      });
+    });
+    document.getElementById("authSubmitBtn").addEventListener("click", function(){
+      var email = document.getElementById("authEmail").value.trim();
+      var password = document.getElementById("authPassword").value;
+      if(!email || !password){ showAuthError("Renseignez un email et un mot de passe."); return; }
+      var action = authMode==="signin" ? signIn(email,password) : signUp(email,password);
+      action.catch(function(err){ showAuthError(authErrorMessage(err)); });
+    });
+  }
+
+  function renderFamilyChoice(){
+    authGateContent.innerHTML =
+      '<p class="sheet-sub" style="text-align:center;margin-top:0;">Bienvenue ! Créez votre famille, ou rejoignez celle de votre conjoint·e.</p>'+
+      '<button class="auth-choice-btn" id="chooseCreate"><span class="em">✨</span><strong>Créer une famille</strong><span class="desc">Vous êtes le/la premier·ère à configurer l\'app.</span></button>'+
+      '<button class="auth-choice-btn" id="chooseJoin"><span class="em">🔗</span><strong>Rejoindre une famille</strong><span class="desc">Votre conjoint·e vous a donné un code.</span></button>';
+    document.getElementById("chooseCreate").addEventListener("click", renderCreateFamily);
+    document.getElementById("chooseJoin").addEventListener("click", renderJoinFamily);
+  }
+
+  function renderCreateFamily(){
+    authGateContent.innerHTML = '<p class="sheet-sub" style="margin-top:0;">Création de votre famille…</p><div id="authError"></div>';
+    createFamily().then(function(code){
+      authGateContent.innerHTML =
+        '<p class="sheet-sub" style="margin-top:0;">Famille créée ! Partagez ce code avec votre conjoint·e pour qu\'il/elle rejoigne :</p>'+
+        '<div class="code-reveal">'+code+'</div>'+
+        '<button class="btn" id="copyCodeBtn" style="width:100%;margin-bottom:10px;">Copier le code</button>'+
+        '<button class="btn primary" id="continueBtn" style="width:100%;">Continuer</button>';
+      document.getElementById("copyCodeBtn").addEventListener("click", function(){
+        if(navigator.clipboard) navigator.clipboard.writeText(code);
+      });
+      document.getElementById("continueBtn").addEventListener("click", function(){
+        renderAll(); showApp();
+      });
+    }).catch(function(err){
+      authGateContent.innerHTML = '<div class="auth-error">'+(err.message||"Erreur")+'</div><button class="btn" id="backBtn" style="width:100%;margin-top:10px;">Retour</button>';
+      document.getElementById("backBtn").addEventListener("click", renderFamilyChoice);
+    });
+  }
+
+  function renderJoinFamily(){
+    authGateContent.innerHTML =
+      '<div class="field"><label>Code de famille</label><input type="text" id="joinCodeInput" placeholder="ex. A1B2C3D4" style="text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-mono);"></div>'+
+      '<div id="authError"></div>'+
+      '<button class="btn primary" id="joinSubmitBtn" style="width:100%;margin-bottom:10px;">Rejoindre</button>'+
+      '<button class="btn ghost" id="backBtn" style="width:100%;">Retour</button>';
+    document.getElementById("backBtn").addEventListener("click", renderFamilyChoice);
+    document.getElementById("joinSubmitBtn").addEventListener("click", function(){
+      var code = document.getElementById("joinCodeInput").value;
+      if(!code.trim()){ showAuthError("Entrez le code reçu."); return; }
+      joinFamily(code).then(function(){
+        renderAll(); showApp();
+      }).catch(function(err){
+        showAuthError(err.message || "Erreur");
+      });
+    });
+  }
+
+  auth.onAuthStateChanged(function(user){
+    if(!user){
+      clearFamilyCodeLocal();
+      authMode = "signin";
+      renderAuthForm();
+      showGate();
+      return;
+    }
+    var code = familyCode();
+    if(!code){
+      renderFamilyChoice();
+      showGate();
+      return;
+    }
+    connectToFamily(code);
+    renderAll();
+    showApp();
+  });
 })();
 </script>
 </body>
