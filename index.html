@@ -206,9 +206,11 @@
     text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:7px;color:var(--ink);
   }
   .allergen-card:hover{background:var(--surface-2);}
+  .allergen-card.priority{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
   .allergen-top{display:flex;align-items:center;justify-content:space-between;}
   .allergen-emoji{font-size:1.4rem;}
   .allergen-name{font-size:.86rem;font-weight:700;line-height:1.25;}
+  .priority-star{color:var(--accent);}
   .allergen-foods{font-size:.7rem;color:var(--ink-faint);line-height:1.4;}
 
   .fab{
@@ -375,7 +377,7 @@
     </section>
 
     <section id="view-allergens" class="view" hidden>
-      <p class="hint">Introduisez les allergènes un par un, si possible le matin, en petite quantité, puis observez 3 à 4 jours avant le suivant. En cas de réaction, contactez votre médecin.</p>
+      <p class="hint">Introduisez les allergènes un par un, si possible le matin, en petite quantité, puis observez 3 à 4 jours avant le suivant. En cas de réaction, contactez votre médecin.<br><span class="priority-star">★</span> = allergène à prioriser.</p>
       <div class="allergen-grid" id="allergenGrid"></div>
     </section>
   </main>
@@ -471,6 +473,10 @@
     crevette: "Toujours bien cuite.",
     fromage_molle: "Choisir du fromage pasteurisé — le fromage au lait cru est à éviter avant 5 ans."
   };
+
+  // Allergènes à introduire en priorité (les plus fréquents / les plus étudiés
+  // dans les recommandations d'introduction précoce).
+  var PRIORITY_ALLERGENS = ["oeufs", "arachides", "fruits_a_coque", "gluten", "lait", "poissons_all"];
 
   var ALLERGENS = [
     {id:"gluten", name:"Gluten", emoji:"🌾", foods:["Blé, orge, seigle, avoine, pâtes, pain"]},
@@ -823,12 +829,13 @@
       var e = state.allergens[a.id];
       var status = e ? e.status : "a_tester";
       var meta = ALLERGEN_STATUS[status];
+      var isPriority = PRIORITY_ALLERGENS.indexOf(a.id) !== -1;
       var card = document.createElement("button");
-      card.className = "allergen-card";
+      card.className = "allergen-card" + (isPriority ? " priority" : "");
       card.innerHTML =
         '<div class="allergen-top"><span class="allergen-emoji">'+a.emoji+'</span>'+
           '<span class="status-pill '+meta.cls+'">'+(meta.emoji?meta.emoji+' ':'')+meta.label+'</span></div>'+
-        '<div class="allergen-name">'+a.name+(e&&e.date?' · <span style="font-family:var(--font-mono);font-weight:400;">'+formatDate(e.date)+'</span>':'')+'</div>'+
+        '<div class="allergen-name">'+(isPriority?'<span class="priority-star" title="Allergène prioritaire">★</span> ':'')+a.name+(e&&e.date?' · <span style="font-family:var(--font-mono);font-weight:400;">'+formatDate(e.date)+'</span>':'')+'</div>'+
         '<div class="allergen-foods">'+a.foods.join(", ")+'</div>';
       card.addEventListener("click", function(){ openAllergenSheet(a.id); });
       wrap.appendChild(card);
