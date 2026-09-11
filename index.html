@@ -421,18 +421,29 @@
     {id:"sucres", label:"Sucres & condiments", emoji:"🍯"}
   ];
 
-  // Âge indicatif de démarrage par catégorie (repères habituels type PMI/pédiatrie,
-  // à ajuster selon votre pédiatre) — affiché en badge "+N mois" à côté de chaque aliment.
+  // Âge indicatif de démarrage par catégorie, d'après la fiche « Introduction des
+  // aliments par âge » de cuisinez-pour-bebe.fr — affiché en badge "+N mois" à côté
+  // de chaque aliment. On retient l'âge de la première cuillère VERTE ("introduction
+  // conseillée") du document, pas l'orange ("possible") ; pour les viandes/poissons/
+  // œufs, la fiche ne donne qu'un seul repère (4 mois) puis des quantités croissantes,
+  // c'est donc ce repère unique qui est utilisé.
   var CATEGORY_MIN_AGE = {
-    legumes:4, fruits:4, feculents:4, proteines:6, poissons:6, laitiers:6,
-    matieres_grasses:4, oleagineux:6, aromates:4, sucres:12
+    legumes:4, fruits:4, feculents:12, proteines:4, poissons:4, laitiers:6,
+    matieres_grasses:4, oleagineux:6, aromates:6, sucres:12
   };
-  // Exceptions aliment par aliment (dérogent au repère de leur catégorie).
+  // Exceptions aliment par aliment (dérogent au repère de leur catégorie), toutes
+  // relevées explicitement sur la fiche.
   var MIN_AGE_OVERRIDES = {
-    celeri:6, artichaut:6, poivron:6, aubergine:6, chou:6, fenouil:6, radis:6, asperge:6, mais:6,
-    orange:6, citron:6, clementine:6, fraise:6, framboise:6, kiwi:6, cerise:6, raisin:6,
-    pates:6, semoule:6, avoine:6, pain:6, ble:6, orge:6, lentilles:6, pois_chiches:6, haricots_secs:6,
-    huile_noix:6, lait_vache:12, ail:6, oignon:6, cannelle:6, vanille:6
+    // Légumes plus tardifs que le repère général (4 mois)
+    artichaut:6, champignon:6, poivron:6, radis:6, tomate:6, celeri:6,
+    chou:9, chou_fleur:9, asperge:9, oignon:9,
+    // Fruits plus tardifs que le repère général (4 mois)
+    fraise:6, kiwi:6, framboise:6, myrtille:6, cerise:6, ananas:6, figue:6,
+    // Féculents plus précoces que le repère général de la catégorie (12 mois)
+    polenta:6, avoine:6, ble:6, orge:6,
+    // Autres
+    lait_vache:12,  // en boisson ; cuit et en petite quantité, possible plus tôt
+    jambon:36        // assimilé à la charcuterie : « pas avant 3 ans » sur la fiche
   };
   function getMinAge(foodId, cat){
     if(MIN_AGE_OVERRIDES.hasOwnProperty(foodId)) return MIN_AGE_OVERRIDES[foodId];
@@ -445,6 +456,7 @@
     miel: "Risque de botulisme infantile : à éviter avant 12 mois.",
     lait_vache: "En boisson, pas avant 12 mois. Cuit et en petite quantité (yaourt, béchamel…), c'est possible dès le début de la diversification.",
     lait_soja: "Les boissons végétales ne remplacent pas le lait avant 3 ans, mais peuvent être utilisées cuisinées en petite quantité dès la diversification.",
+    jambon: "Comme toute charcuterie : pas avant 3 ans, selon la fiche cuisinez-pour-bébé.",
     amande: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
     noisette: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
     noix: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
@@ -457,7 +469,7 @@
     moules: "Toujours bien cuites.",
     calamar: "Toujours bien cuit.",
     crevette: "Toujours bien cuite.",
-    fromage_molle: "Préférer le pasteurisé ; éviter le lait cru avant 12 mois."
+    fromage_molle: "Choisir du fromage pasteurisé — le fromage au lait cru est à éviter avant 5 ans."
   };
 
   var ALLERGENS = [
