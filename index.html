@@ -1,0 +1,1332 @@
+<title>Premières Bouchées</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Figtree:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F1E6;
+    --surface:#FFFFFF;
+    --surface-2:#ECE5D3;
+    --surface-3:#E2D9C2;
+    --ink:#2B2230;
+    --ink-soft:#6C6072;
+    --ink-faint:#948A97;
+    --accent:#DE7A3D;
+    --accent-ink:#FFFFFF;
+    --accent-soft:#F6DEC5;
+    --ok:#5F8A56;
+    --ok-soft:#DEE9D6;
+    --warn:#B4862A;
+    --warn-soft:#F0E3C4;
+    --danger:#BD4258;
+    --danger-soft:#F4DBDF;
+    --border:#E2D9C2;
+    --shadow:0 12px 30px -14px rgba(43,34,48,.28);
+    --font-display:'Fraunces', Georgia, serif;
+    --font-body:'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono:'Space Mono', 'SFMono-Regular', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#211A29;
+      --surface:#2B2333;
+      --surface-2:#362D3E;
+      --surface-3:#43384C;
+      --ink:#F3EEE9;
+      --ink-soft:#C2B8C7;
+      --ink-faint:#8E8296;
+      --accent:#F0975C;
+      --accent-ink:#241708;
+      --accent-soft:#4A3421;
+      --ok:#8FB980;
+      --ok-soft:#33402E;
+      --warn:#E1C061;
+      --warn-soft:#463A20;
+      --danger:#E68A98;
+      --danger-soft:#4A2A31;
+      --border:#43384C;
+      --shadow:0 12px 30px -14px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#211A29;
+    --surface:#2B2333;
+    --surface-2:#362D3E;
+    --surface-3:#43384C;
+    --ink:#F3EEE9;
+    --ink-soft:#C2B8C7;
+    --ink-faint:#8E8296;
+    --accent:#F0975C;
+    --accent-ink:#241708;
+    --accent-soft:#4A3421;
+    --ok:#8FB980;
+    --ok-soft:#33402E;
+    --warn:#E1C061;
+    --warn-soft:#463A20;
+    --danger:#E68A98;
+    --danger-soft:#4A2A31;
+    --border:#43384C;
+    --shadow:0 12px 30px -14px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  #app{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0;}
+  button{font-family:inherit;}
+  input,textarea,select{font-family:inherit;font-size:1rem;color:var(--ink);}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* ---------- Header ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:10;
+    background:var(--bg);
+    padding:16px 16px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-main{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{font-size:1.9rem;line-height:1;}
+  .brand-text h1{font-size:1.5rem;letter-spacing:-.01em;}
+  .subtitle{margin:2px 0 0;font-size:.85rem;color:var(--ink-soft);}
+  .icon-btn{
+    width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface);font-size:1.15rem;cursor:pointer;flex:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn:hover{background:var(--surface-2);}
+
+  .stats-row{display:flex;gap:14px;margin:16px 0 12px;}
+  .stat{flex:1;min-width:0;}
+  .stat-value{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;font-size:1.05rem;}
+  .stat-label{font-size:.7rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
+  .bar{height:6px;border-radius:99px;background:var(--surface-3);margin-top:6px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease;}
+  .bar-fill.accent-alt{background:var(--ok);}
+
+  .reaction-banner{
+    display:flex;align-items:center;gap:8px;width:100%;margin-bottom:12px;
+    background:var(--danger-soft);color:var(--danger);border:1px solid var(--danger);
+    border-radius:12px;padding:9px 12px;font-size:.85rem;font-weight:600;cursor:pointer;
+    text-align:left;
+  }
+
+  .tabs{display:flex;gap:4px;}
+  .tab{
+    flex:1;padding:10px 8px;border:none;background:none;color:var(--ink-soft);
+    font-weight:600;font-size:.9rem;cursor:pointer;border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+  }
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+  /* ---------- Main / views ---------- */
+  main{flex:1;padding-bottom:96px;}
+  .view{padding:14px 16px 0;}
+
+  .toolbar{position:sticky;top:0;background:var(--bg);padding-top:14px;padding-bottom:10px;z-index:5;}
+  #searchInput{
+    width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);
+  }
+  #searchInput::placeholder{color:var(--ink-faint);}
+
+  .filter-chips{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none;}
+  .filter-chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:none;padding:7px 13px;border-radius:99px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink-soft);font-size:.82rem;font-weight:600;cursor:pointer;
+    white-space:nowrap;
+  }
+  .chip.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+  .cat-group{margin-bottom:18px;}
+  .cat-header{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:6px 2px;cursor:pointer;user-select:none;
+  }
+  .cat-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;}
+  .cat-count{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+  .cat-chevron{color:var(--ink-faint);transition:transform .2s ease;font-size:.75rem;}
+  .cat-group.collapsed .cat-chevron{transform:rotate(-90deg);}
+  .cat-group.collapsed .food-list{display:none;}
+
+  .food-list{
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  }
+  .food-row{
+    display:flex;align-items:center;gap:11px;width:100%;padding:11px 13px;
+    border:none;background:none;text-align:left;cursor:pointer;border-bottom:1px solid var(--border);
+    color:var(--ink);
+  }
+  .food-row:last-child{border-bottom:none;}
+  .food-row:hover{background:var(--surface-2);}
+  .food-emoji{font-size:1.35rem;flex:none;width:28px;text-align:center;}
+  .food-main{flex:1;min-width:0;}
+  .food-name{font-size:.95rem;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .age-badge{
+    font-family:var(--font-mono);font-size:.66rem;font-weight:700;color:var(--ink-faint);
+    background:var(--surface-2);padding:1px 6px;border-radius:6px;letter-spacing:.01em;
+    font-variant-numeric:tabular-nums;
+  }
+  .allergen-dot{width:6px;height:6px;border-radius:99px;background:var(--danger);flex:none;}
+  .food-meta{font-size:.75rem;color:var(--ink-soft);font-family:var(--font-mono);margin-top:1px;}
+  .status-pill{
+    flex:none;font-size:.72rem;font-weight:700;padding:4px 9px;border-radius:99px;
+    background:var(--surface-3);color:var(--ink-soft);white-space:nowrap;
+  }
+  .status-pill.ok{background:var(--ok-soft);color:var(--ok);}
+  .status-pill.warn{background:var(--warn-soft);color:var(--warn);}
+  .status-pill.danger{background:var(--danger-soft);color:var(--danger);}
+
+  .empty-state{padding:40px 16px;text-align:center;color:var(--ink-soft);}
+  .empty-state .em{font-size:2rem;display:block;margin-bottom:8px;}
+
+  .hint{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:12px;
+    padding:11px 13px;font-size:.83rem;color:var(--ink-soft);line-height:1.5;margin:0 0 14px;
+  }
+  .allergen-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .allergen-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px;
+    text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:7px;color:var(--ink);
+  }
+  .allergen-card:hover{background:var(--surface-2);}
+  .allergen-top{display:flex;align-items:center;justify-content:space-between;}
+  .allergen-emoji{font-size:1.4rem;}
+  .allergen-name{font-size:.86rem;font-weight:700;line-height:1.25;}
+  .allergen-foods{font-size:.7rem;color:var(--ink-faint);line-height:1.4;}
+
+  .fab{
+    position:fixed;left:50%;transform:translateX(calc(-1 * min(280px,45vw) + 16px));
+    bottom:20px;width:52px;height:52px;border-radius:16px;border:none;
+    background:var(--accent);color:var(--accent-ink);font-size:1.6rem;box-shadow:var(--shadow);
+    cursor:pointer;z-index:8;
+  }
+  @media (min-width:560px){
+    .fab{left:auto;right:calc(50vw - 280px + 20px);transform:none;}
+  }
+
+  /* ---------- Sheet / modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,14,22,.45);z-index:20;
+    display:flex;align-items:flex-end;justify-content:center;
+  }
+  .sheet{
+    width:100%;max-width:560px;max-height:88vh;overflow-y:auto;
+    background:var(--surface);border-radius:20px 20px 0 0;padding:10px 20px 24px;
+    box-shadow:var(--shadow);animation:sheet-up .22s ease;
+  }
+  @media (prefers-reduced-motion: reduce){ .sheet{animation:none;} }
+  @keyframes sheet-up{from{transform:translateY(16px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+  .sheet-handle{width:36px;height:4px;background:var(--surface-3);border-radius:99px;margin:0 auto 14px;}
+  .sheet-title{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .sheet-title .em{font-size:1.6rem;}
+  .sheet-title h2{font-size:1.25rem;}
+  .sheet-sub{font-size:.8rem;color:var(--ink-soft);margin:0 0 16px;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:7px;}
+  .seg{display:flex;flex-wrap:wrap;gap:7px;}
+  .seg-btn{
+    flex:1;min-width:86px;padding:9px 8px;border-radius:11px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink-soft);font-size:.8rem;font-weight:700;cursor:pointer;
+    text-align:center;
+  }
+  .seg-btn.sel{border-color:currentColor;}
+  .seg-btn.sel.ok{background:var(--ok-soft);color:var(--ok);}
+  .seg-btn.sel.warn{background:var(--warn-soft);color:var(--warn);}
+  .seg-btn.sel.danger{background:var(--danger-soft);color:var(--danger);}
+  .seg-btn.sel.neutral{background:var(--surface-3);color:var(--ink);}
+
+  input[type=date],input[type=text],textarea,select{
+    width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:64px;}
+  .chip-select{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip-select .chip{cursor:pointer;}
+
+  .sheet-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn{
+    flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
+    background:var(--surface);color:var(--ink);font-weight:700;font-size:.9rem;cursor:pointer;
+  }
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+  .btn.ghost{background:none;color:var(--ink-soft);border-color:transparent;}
+  .btn.danger-outline{color:var(--danger);border-color:var(--danger-soft);}
+
+  .settings-section{margin-bottom:22px;}
+  .settings-section h3{font-size:.95rem;margin-bottom:10px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .sync-box{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px;}
+  .sync-box textarea{font-family:var(--font-mono);font-size:.72rem;}
+  .sync-row{display:flex;gap:8px;margin-top:8px;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;
+    font-size:.85rem;font-weight:600;z-index:40;box-shadow:var(--shadow);
+  }
+
+  [hidden]{display:none!important;}
+</style>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-main">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">🥄</span>
+        <div class="brand-text">
+          <h1>Premières Bouchées</h1>
+          <p class="subtitle" id="babySubtitle">Bienvenue !</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙️</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-value"><span id="statFoods">0/0</span></div>
+        <div class="stat-label">aliments testés</div>
+        <div class="bar"><div class="bar-fill" id="barFoods" style="width:0%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-value"><span id="statAllergens">0/14</span></div>
+        <div class="stat-label">allergènes testés</div>
+        <div class="bar"><div class="bar-fill accent-alt" id="barAllergens" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <button class="reaction-banner" id="reactionBanner" hidden></button>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-view="foods" role="tab" aria-selected="true">Aliments</button>
+      <button class="tab" data-view="allergens" role="tab" aria-selected="false">Allergènes</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="view-foods" class="view">
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Rechercher un aliment…" autocomplete="off">
+        <div class="filter-chips" id="statusFilters"></div>
+      </div>
+      <div id="foodList"></div>
+    </section>
+
+    <section id="view-allergens" class="view" hidden>
+      <p class="hint">Introduisez les allergènes un par un, si possible le matin, en petite quantité, puis observez 3 à 4 jours avant le suivant. En cas de réaction, contactez votre médecin.</p>
+      <div class="allergen-grid" id="allergenGrid"></div>
+    </section>
+  </main>
+
+  <button class="fab" id="addFoodBtn" aria-label="Ajouter un aliment">+</button>
+
+  <div class="overlay" id="sheetOverlay" hidden>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <div id="sheetContent"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= DATA ================= */
+  var CATEGORIES = [
+    {id:"legumes", label:"Légumes", emoji:"🥕"},
+    {id:"fruits", label:"Fruits", emoji:"🍎"},
+    {id:"feculents", label:"Féculents & céréales", emoji:"🌾"},
+    {id:"proteines", label:"Viandes & œufs", emoji:"🍗"},
+    {id:"poissons", label:"Poissons & fruits de mer", emoji:"🐟"},
+    {id:"laitiers", label:"Produits laitiers", emoji:"🧀"},
+    {id:"matieres_grasses", label:"Matières grasses", emoji:"🫒"},
+    {id:"oleagineux", label:"Oléagineux & graines", emoji:"🥜"},
+    {id:"aromates", label:"Herbes & épices", emoji:"🌿"},
+    {id:"sucres", label:"Sucres & condiments", emoji:"🍯"}
+  ];
+
+  // Âge indicatif de démarrage par catégorie (repères habituels type PMI/pédiatrie,
+  // à ajuster selon votre pédiatre) — affiché en badge "+N mois" à côté de chaque aliment.
+  var CATEGORY_MIN_AGE = {
+    legumes:4, fruits:4, feculents:4, proteines:6, poissons:6, laitiers:6,
+    matieres_grasses:4, oleagineux:6, aromates:4, sucres:12
+  };
+  // Exceptions aliment par aliment (dérogent au repère de leur catégorie).
+  var MIN_AGE_OVERRIDES = {
+    celeri:6, artichaut:6, poivron:6, aubergine:6, chou:6, fenouil:6, radis:6, asperge:6, mais:6,
+    orange:6, citron:6, clementine:6, fraise:6, framboise:6, kiwi:6, cerise:6, raisin:6,
+    pates:6, semoule:6, avoine:6, pain:6, ble:6, orge:6, lentilles:6, pois_chiches:6, haricots_secs:6,
+    huile_noix:6, lait_vache:12, ail:6, oignon:6, cannelle:6, vanille:6
+  };
+  function getMinAge(foodId, cat){
+    if(MIN_AGE_OVERRIDES.hasOwnProperty(foodId)) return MIN_AGE_OVERRIDES[foodId];
+    return CATEGORY_MIN_AGE[cat] || 4;
+  }
+  var ALLERGEN_MIN_AGE = 6;
+
+  // Précautions ponctuelles, indépendantes de l'âge de démarrage.
+  var FOOD_NOTES = {
+    miel: "Risque de botulisme infantile : à éviter avant 12 mois.",
+    lait_vache: "En boisson, pas avant 12 mois. Cuit et en petite quantité (yaourt, béchamel…), c'est possible dès le début de la diversification.",
+    lait_soja: "Les boissons végétales ne remplacent pas le lait avant 3 ans, mais peuvent être utilisées cuisinées en petite quantité dès la diversification.",
+    amande: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    noisette: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    noix: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    noix_cajou: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    pistache: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    noix_pecan: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    noix_bresil: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    noix_macadamia: "En purée ou poudre uniquement — pas de morceaux entiers avant 4-5 ans (étouffement).",
+    arachide: "En purée uniquement — jamais de cacahuètes entières avant 4-5 ans (étouffement).",
+    moules: "Toujours bien cuites.",
+    calamar: "Toujours bien cuit.",
+    crevette: "Toujours bien cuite.",
+    fromage_molle: "Préférer le pasteurisé ; éviter le lait cru avant 12 mois."
+  };
+
+  var ALLERGENS = [
+    {id:"gluten", name:"Gluten", emoji:"🌾", foods:["Blé, orge, seigle, avoine, pâtes, pain"]},
+    {id:"crustaces", name:"Crustacés", emoji:"🦐", foods:["Crevette"]},
+    {id:"oeufs", name:"Œufs", emoji:"🥚", foods:["Œuf"]},
+    {id:"poissons_all", name:"Poissons", emoji:"🐟", foods:["Thon, saumon, cabillaud, sardine, maquereau"]},
+    {id:"arachides", name:"Arachides", emoji:"🥜", foods:["Cacahuète, purée de cacahuète"]},
+    {id:"soja", name:"Soja", emoji:"🫘", foods:["Tofu, lait de soja"]},
+    {id:"lait", name:"Lait", emoji:"🥛", foods:["Lait de vache, yaourt, fromage"]},
+    {id:"fruits_a_coque", name:"Fruits à coque", emoji:"🌰", foods:["Amande, noisette, noix, cajou, pistache…"]},
+    {id:"celeri", name:"Céleri", emoji:"🥬", foods:["Céleri branche ou rave"]},
+    {id:"moutarde", name:"Moutarde", emoji:"🌭", foods:["Graines ou condiment moutarde"]},
+    {id:"sesame", name:"Sésame", emoji:"🌱", foods:["Graines de sésame, tahin"]},
+    {id:"sulfites", name:"Sulfites", emoji:"🍇", foods:["Fruits secs, certains jus"]},
+    {id:"lupin", name:"Lupin", emoji:"🫛", foods:["Farine de lupin"]},
+    {id:"mollusques", name:"Mollusques", emoji:"🦪", foods:["Moules, calamar, escargot"]}
+  ];
+
+  function f(id,name,emoji,cat,allergens){
+    return {id:id,name:name,emoji:emoji,cat:cat,allergens:allergens||[]};
+  }
+
+  var FOODS = [
+    f("carotte","Carotte","🥕","legumes"), f("patate_douce","Patate douce","🍠","legumes"),
+    f("potiron","Potiron / courge","🎃","legumes"), f("courgette","Courgette","🥒","legumes"),
+    f("chou_fleur","Chou-fleur","🥦","legumes"), f("champignon","Champignon","🍄","legumes"),
+    f("endive","Endive","🥬","legumes"), f("pomme_de_terre","Pomme de terre","🥔","legumes"),
+    f("poireau","Poireau","🥬","legumes"), f("haricot_vert","Haricot vert","🫛","legumes"),
+    f("petit_pois","Petit pois","🫛","legumes"), f("tomate","Tomate","🍅","legumes"),
+    f("epinard","Épinard","🥬","legumes"), f("concombre","Concombre","🥒","legumes"),
+    f("artichaut","Artichaut","🌿","legumes"), f("brocoli","Brocoli","🥦","legumes"),
+    f("betterave","Betterave","🫐","legumes"), f("panais","Panais","🥕","legumes"),
+    f("navet","Navet","🥔","legumes"), f("aubergine","Aubergine","🍆","legumes"),
+    f("poivron","Poivron","🫑","legumes"), f("chou","Chou","🥬","legumes"),
+    f("fenouil","Fenouil","🌿","legumes"), f("radis","Radis","🌱","legumes"),
+    f("asperge","Asperge","🌱","legumes"), f("mais","Maïs","🌽","legumes"),
+    f("celeri","Céleri","🥬","legumes",["celeri"]),
+
+    f("pomme","Pomme","🍎","fruits"), f("poire","Poire","🍐","fruits"),
+    f("banane","Banane","🍌","fruits"), f("fraise","Fraise","🍓","fruits"),
+    f("melon","Melon","🍈","fruits"), f("nectarine","Nectarine","🍑","fruits"),
+    f("kiwi","Kiwi","🥝","fruits"), f("orange","Orange","🍊","fruits"),
+    f("citron","Citron","🍋","fruits"), f("peche","Pêche","🍑","fruits"),
+    f("prune","Prune","🟣","fruits"), f("pruneau","Pruneau","🟤","fruits"),
+    f("abricot","Abricot","🍑","fruits"), f("framboise","Framboise","🍓","fruits"),
+    f("myrtille","Myrtille","🫐","fruits"), f("cerise","Cerise","🍒","fruits"),
+    f("mangue","Mangue","🥭","fruits"), f("ananas","Ananas","🍍","fruits"),
+    f("pasteque","Pastèque","🍉","fruits"), f("figue","Figue","🟤","fruits"),
+    f("raisin","Raisin","🍇","fruits",["sulfites"]), f("clementine","Clémentine","🍊","fruits"),
+    f("avocat","Avocat","🥑","fruits"),
+
+    f("riz","Riz","🍚","feculents"), f("pates","Pâtes","🍝","feculents",["gluten"]),
+    f("semoule","Semoule","🌾","feculents",["gluten"]), f("polenta","Polenta","🌽","feculents"),
+    f("avoine","Avoine / flocons","🌾","feculents",["gluten"]), f("quinoa","Quinoa","🌾","feculents"),
+    f("pain","Pain","🍞","feculents",["gluten"]), f("ble","Blé complet","🌾","feculents",["gluten"]),
+    f("orge","Orge","🌾","feculents",["gluten"]), f("lentilles","Lentilles","🫘","feculents"),
+    f("pois_chiches","Pois chiches","🫘","feculents"), f("haricots_secs","Haricots secs","🫘","feculents"),
+
+    f("poulet","Poulet","🍗","proteines"), f("boeuf","Bœuf","🥩","proteines"),
+    f("veau","Veau","🥩","proteines"), f("porc","Porc","🥓","proteines"),
+    f("dinde","Dinde","🍗","proteines"), f("agneau","Agneau","🍖","proteines"),
+    f("jambon","Jambon","🍖","proteines"), f("oeuf","Œuf","🥚","proteines",["oeufs"]),
+    f("foie","Foie","🍖","proteines"),
+
+    f("thon","Thon","🐟","poissons",["poissons_all"]), f("saumon","Saumon","🐟","poissons",["poissons_all"]),
+    f("cabillaud","Cabillaud","🐟","poissons",["poissons_all"]), f("sardine","Sardine","🐟","poissons",["poissons_all"]),
+    f("maquereau","Maquereau","🐟","poissons",["poissons_all"]), f("crevette","Crevette","🦐","poissons",["crustaces"]),
+    f("moules","Moules","🦪","poissons",["mollusques"]), f("calamar","Calamar","🦑","poissons",["mollusques"]),
+
+    f("lait_vache","Lait de vache","🥛","laitiers",["lait"]), f("yaourt","Yaourt","🥣","laitiers",["lait"]),
+    f("fromage_blanc","Fromage blanc","🥣","laitiers",["lait"]), f("petit_suisse","Petit-suisse","🥣","laitiers",["lait"]),
+    f("fromage_dur","Fromage à pâte dure","🧀","laitiers",["lait"]), f("fromage_molle","Fromage à pâte molle","🧀","laitiers",["lait"]),
+    f("creme_dessert","Crème dessert","🍮","laitiers",["lait"]), f("beurre","Beurre","🧈","laitiers",["lait"]),
+    f("creme_fraiche","Crème fraîche","🥛","laitiers",["lait"]),
+
+    f("huile_olive","Huile d'olive","🫒","matieres_grasses"), f("huile_colza","Huile de colza","🫒","matieres_grasses"),
+    f("huile_noix","Huile de noix","🫒","matieres_grasses",["fruits_a_coque"]),
+
+    f("amande","Amande (purée/poudre)","🌰","oleagineux",["fruits_a_coque"]),
+    f("noisette","Noisette (purée/poudre)","🌰","oleagineux",["fruits_a_coque"]),
+    f("noix","Noix (purée/poudre)","🌰","oleagineux",["fruits_a_coque"]),
+    f("noix_cajou","Noix de cajou","🌰","oleagineux",["fruits_a_coque"]),
+    f("pistache","Pistache","🌰","oleagineux",["fruits_a_coque"]),
+    f("noix_pecan","Noix de pécan","🌰","oleagineux",["fruits_a_coque"]),
+    f("noix_bresil","Noix du Brésil","🌰","oleagineux",["fruits_a_coque"]),
+    f("noix_macadamia","Noix de macadamia","🌰","oleagineux",["fruits_a_coque"]),
+    f("arachide","Cacahuète (purée)","🥜","oleagineux",["arachides"]),
+    f("graines_sesame","Graines de sésame","🌱","oleagineux",["sesame"]),
+    f("tahini","Purée de sésame (tahin)","🌱","oleagineux",["sesame"]),
+    f("tofu","Tofu","🧈","oleagineux",["soja"]),
+    f("lait_soja","Lait de soja","🥛","oleagineux",["soja"]),
+    f("moutarde_cond","Moutarde","🌭","oleagineux",["moutarde"]),
+    f("lupin","Farine de lupin","🫛","oleagineux",["lupin"]),
+
+    f("ail","Ail","🧄","aromates"), f("oignon","Oignon","🧅","aromates"),
+    f("persil","Persil","🌿","aromates"), f("basilic","Basilic","🌿","aromates"),
+    f("thym","Thym","🌿","aromates"), f("cannelle","Cannelle","🌿","aromates"),
+    f("vanille","Vanille","🌿","aromates"),
+
+    f("miel","Miel","🍯","sucres")
+  ];
+
+  var FOOD_STATUS = {
+    a_tester:  {label:"À tester", cls:""},
+    aime:      {label:"Aimé", cls:"ok", emoji:"😋"},
+    neutre:    {label:"Neutre", cls:"", emoji:"😐"},
+    naime_pas: {label:"Pas aimé", cls:"warn", emoji:"😕"},
+    reaction:  {label:"Réaction", cls:"danger", emoji:"⚠️"}
+  };
+  var FOOD_STATUS_ORDER = ["a_tester","aime","neutre","naime_pas","reaction"];
+
+  var ALLERGEN_STATUS = {
+    a_tester: {label:"À tester", cls:""},
+    ok:       {label:"Toléré", cls:"ok", emoji:"✅"},
+    reaction: {label:"Réaction", cls:"danger", emoji:"⚠️"}
+  };
+  var ALLERGEN_STATUS_ORDER = ["a_tester","ok","reaction"];
+
+  /* ================= STATE ================= */
+  var STORAGE_KEY = "pb_state_v2";
+
+  function defaultState(){
+    return {
+      v: 2,
+      baby: {name:""},
+      parents: {a:"Maman", b:"Papa"},
+      foods: {},       // id -> {status,date,notes,by,updatedAt}
+      allergens: {},   // id -> {status,date,notes,updatedAt}
+      customFoods: [],  // {id,name,emoji,cat,allergens,updatedAt}
+      ui: {collapsed:{}, filter:"all", search:""}
+    };
+  }
+
+  var state = loadState();
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultState();
+      var parsed = JSON.parse(raw);
+      var base = defaultState();
+      return Object.assign(base, parsed, {
+        baby: Object.assign(base.baby, parsed.baby),
+        parents: Object.assign(base.parents, parsed.parents),
+        foods: parsed.foods || {},
+        allergens: parsed.allergens || {},
+        customFoods: parsed.customFoods || [],
+        ui: Object.assign(base.ui, parsed.ui)
+      });
+    }catch(e){ return defaultState(); }
+  }
+
+  function saveStateLocalOnly(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function saveState(){
+    saveStateLocalOnly();
+    scheduleGhSync();
+  }
+
+  function allFoods(){
+    return FOODS.concat(state.customFoods);
+  }
+
+  function nowIso(){ return new Date().toISOString(); }
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function normalize(s){
+    return (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  }
+  function formatDate(iso){
+    if(!iso) return "";
+    var p = iso.split("-");
+    if(p.length!==3) return iso;
+    return p[2]+"/"+p[1]+"/"+p[0].slice(2);
+  }
+
+  /* ================= AGE ================= */
+  function babySubtitle(){
+    var name = state.baby.name;
+    return name ? ("Le carnet de " + name) : "Suivi de la diversification alimentaire";
+  }
+
+  function foodAgeInfo(foodId, cat){
+    var minAge = getMinAge(foodId, cat);
+    return {minAge: minAge, note: FOOD_NOTES[foodId] || ""};
+  }
+
+  // Béaba classe ses recettes par tranche d'âge : 1=4/6m 2=7/8m 3=9/12m 4=13/24m 5=25m+
+  function beabaBucketForAge(months){
+    if(months<7) return 1;
+    if(months<9) return 2;
+    if(months<13) return 3;
+    if(months<25) return 4;
+    return 5;
+  }
+  function beabaUrl(minAge){
+    return "https://www.beaba.com/fr-fr/recettes-bebe?age=" + beabaBucketForAge(minAge);
+  }
+
+  /* ================= STATS ================= */
+  function computeStats(){
+    var foods = allFoods();
+    var testedFoods = 0, reactions = 0;
+    foods.forEach(function(fo){
+      var e = state.foods[fo.id];
+      if(e && e.status && e.status !== "a_tester") testedFoods++;
+      if(e && e.status === "reaction") reactions++;
+    });
+    var testedAllergens = 0, allergenReactions = 0;
+    ALLERGENS.forEach(function(a){
+      var e = state.allergens[a.id];
+      if(e && e.status && e.status !== "a_tester") testedAllergens++;
+      if(e && e.status === "reaction") allergenReactions++;
+    });
+    return {
+      foodsTotal: foods.length, foodsTested: testedFoods, foodReactions: reactions,
+      allergensTotal: ALLERGENS.length, allergensTested: testedAllergens, allergenReactions: allergenReactions
+    };
+  }
+
+  /* ================= RENDER: HEADER ================= */
+  function renderHeader(){
+    document.getElementById("babySubtitle").textContent = babySubtitle();
+    var st = computeStats();
+    document.getElementById("statFoods").textContent = st.foodsTested + "/" + st.foodsTotal;
+    document.getElementById("barFoods").style.width = (st.foodsTotal? (st.foodsTested/st.foodsTotal*100):0) + "%";
+    document.getElementById("statAllergens").textContent = st.allergensTested + "/" + st.allergensTotal;
+    document.getElementById("barAllergens").style.width = (st.allergensTested/st.allergensTotal*100) + "%";
+
+    var totalReactions = st.foodReactions + st.allergenReactions;
+    var banner = document.getElementById("reactionBanner");
+    if(totalReactions>0){
+      banner.hidden = false;
+      banner.textContent = "⚠️ " + totalReactions + " réaction" + (totalReactions>1?"s":"") + " notée" + (totalReactions>1?"s":"") + " — voir le détail";
+    } else {
+      banner.hidden = true;
+    }
+  }
+
+  /* ================= RENDER: FOODS ================= */
+  var STATUS_FILTERS = [
+    {id:"all", label:"Tous"},
+    {id:"a_tester", label:"À tester"},
+    {id:"tested", label:"Testés"},
+    {id:"reaction", label:"Réactions ⚠️"}
+  ];
+
+  function renderStatusFilters(){
+    var wrap = document.getElementById("statusFilters");
+    wrap.innerHTML = "";
+    STATUS_FILTERS.forEach(function(sf){
+      var b = document.createElement("button");
+      b.className = "chip" + (state.ui.filter===sf.id ? " active":"");
+      b.textContent = sf.label;
+      b.addEventListener("click", function(){
+        state.ui.filter = sf.id; saveState(); renderFoods();
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  function foodMatchesFilter(fo){
+    var e = state.foods[fo.id];
+    var status = e ? e.status : "a_tester";
+    var filter = state.ui.filter;
+    if(filter==="a_tester") return status==="a_tester";
+    if(filter==="tested") return status!=="a_tester";
+    if(filter==="reaction") return status==="reaction";
+    return true;
+  }
+
+  function renderFoods(){
+    var q = normalize(state.ui.search);
+    var wrap = document.getElementById("foodList");
+    wrap.innerHTML = "";
+    var foods = allFoods();
+    var any = false;
+
+    CATEGORIES.forEach(function(cat){
+      var items = foods.filter(function(fo){
+        if(fo.cat !== cat.id) return false;
+        if(!foodMatchesFilter(fo)) return false;
+        if(q && normalize(fo.name).indexOf(q) === -1) return false;
+        return true;
+      });
+      items.sort(function(a,b){ return a.name.localeCompare(b.name, "fr"); });
+      if(items.length===0) return;
+      any = true;
+
+      var totalInCat = foods.filter(function(fo){return fo.cat===cat.id;}).length;
+      var testedInCat = foods.filter(function(fo){
+        if(fo.cat!==cat.id) return false;
+        var e = state.foods[fo.id];
+        return e && e.status && e.status!=="a_tester";
+      }).length;
+
+      var group = document.createElement("div");
+      group.className = "cat-group" + (state.ui.collapsed[cat.id] ? " collapsed":"");
+
+      var header = document.createElement("div");
+      header.className = "cat-header";
+      header.innerHTML =
+        '<div class="cat-title">'+cat.emoji+' '+cat.label+'</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;">'+
+          '<span class="cat-count">'+testedInCat+'/'+totalInCat+'</span>'+
+          '<span class="cat-chevron">▾</span>'+
+        '</div>';
+      header.addEventListener("click", function(){
+        state.ui.collapsed[cat.id] = !state.ui.collapsed[cat.id];
+        saveState(); renderFoods();
+      });
+      group.appendChild(header);
+
+      var list = document.createElement("div");
+      list.className = "food-list";
+      items.forEach(function(fo){
+        var e = state.foods[fo.id];
+        var status = e ? e.status : "a_tester";
+        var meta = FOOD_STATUS[status];
+        var ageInfo = foodAgeInfo(fo.id, fo.cat);
+        var row = document.createElement("button");
+        row.className = "food-row";
+        row.innerHTML =
+          '<span class="food-emoji">'+fo.emoji+'</span>'+
+          '<span class="food-main">'+
+            '<span class="food-name">'+fo.name+' <span class="age-badge">+'+ageInfo.minAge+'</span>'+ (fo.allergens.length ? ' <span class="allergen-dot" title="Allergène"></span>':'') +'</span>'+
+            (e && e.date ? '<span class="food-meta">'+formatDate(e.date)+'</span>' : '') +
+          '</span>'+
+          '<span class="status-pill '+meta.cls+'">'+(meta.emoji?meta.emoji+' ':'')+meta.label+'</span>';
+        row.addEventListener("click", function(){ openFoodSheet(fo.id); });
+        list.appendChild(row);
+      });
+      group.appendChild(list);
+      wrap.appendChild(group);
+    });
+
+    if(!any){
+      wrap.innerHTML = '<div class="empty-state"><span class="em">🔍</span>Aucun aliment ne correspond.</div>';
+    }
+  }
+
+  /* ================= RENDER: ALLERGENS ================= */
+  function renderAllergens(){
+    var wrap = document.getElementById("allergenGrid");
+    wrap.innerHTML = "";
+    ALLERGENS.forEach(function(a){
+      var e = state.allergens[a.id];
+      var status = e ? e.status : "a_tester";
+      var meta = ALLERGEN_STATUS[status];
+      var card = document.createElement("button");
+      card.className = "allergen-card";
+      card.innerHTML =
+        '<div class="allergen-top"><span class="allergen-emoji">'+a.emoji+'</span>'+
+          '<span class="status-pill '+meta.cls+'">'+(meta.emoji?meta.emoji+' ':'')+meta.label+'</span></div>'+
+        '<div class="allergen-name">'+a.name+(e&&e.date?' · <span style="font-family:var(--font-mono);font-weight:400;">'+formatDate(e.date)+'</span>':'')+'</div>'+
+        '<div class="allergen-foods">'+a.foods.join(", ")+'</div>';
+      card.addEventListener("click", function(){ openAllergenSheet(a.id); });
+      wrap.appendChild(card);
+    });
+  }
+
+  /* ================= SHEET ================= */
+  var overlay = document.getElementById("sheetOverlay");
+  var sheetContent = document.getElementById("sheetContent");
+
+  function openSheet(html, onMount){
+    sheetContent.innerHTML = html;
+    overlay.hidden = false;
+    if(onMount) onMount();
+  }
+  function closeSheet(){ overlay.hidden = true; sheetContent.innerHTML=""; }
+  overlay.addEventListener("click", function(e){ if(e.target===overlay) closeSheet(); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !overlay.hidden) closeSheet(); });
+
+  function openFoodSheet(foodId){
+    var fo = allFoods().find(function(x){return x.id===foodId;});
+    if(!fo) return;
+    var e = state.foods[foodId] || {status:"a_tester", date:"", notes:"", by:""};
+    var allergenNote = fo.allergens.length ?
+      '<p class="sheet-sub">⚠️ Contient : '+fo.allergens.map(function(id){
+        var a = ALLERGENS.find(function(x){return x.id===id;});
+        return a?a.name:id;
+      }).join(", ")+'</p>' : '';
+
+    var ageInfo = foodAgeInfo(foodId, fo.cat);
+    var ageHtml = '<div class="hint">🗓️ Repère indicatif : à partir de '+ageInfo.minAge+' mois.'+(ageInfo.note?" "+ageInfo.note:"")+' <em>À ajuster avec votre pédiatre.</em></div>';
+    var recipeHtml = '<a class="btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:16px;" href="'+beabaUrl(ageInfo.minAge)+'" target="_blank" rel="noopener">💡 Idées de recettes avec '+fo.name.toLowerCase()+' (Béaba)</a>';
+
+    var statusButtons = FOOD_STATUS_ORDER.map(function(k){
+      var m = FOOD_STATUS[k];
+      var sel = (e.status===k);
+      return '<button type="button" class="seg-btn'+(sel?' sel '+(m.cls||'neutral'):'')+'" data-status="'+k+'">'+(m.emoji?m.emoji+' ':'')+m.label+'</button>';
+    }).join("");
+
+    var byOptions = ['', state.parents.a, state.parents.b, "Les deux"].map(function(v){
+      var label = v || "Non précisé";
+      var sel = (e.by||"")===v;
+      return '<option value="'+v+'"'+(sel?' selected':'')+'>'+label+'</option>';
+    }).join("");
+
+    openSheet(
+      '<div class="sheet-title"><span class="em">'+fo.emoji+'</span><h2>'+fo.name+'</h2></div>'+
+      allergenNote+
+      ageHtml+
+      recipeHtml+
+      '<div class="field"><label>État</label><div class="seg" id="statusSeg">'+statusButtons+'</div></div>'+
+      '<div class="field"><label>Date</label><input type="date" id="foodDate" value="'+(e.date||"")+'"></div>'+
+      '<div class="field"><label>Testé par</label><select id="foodBy">'+byOptions+'</select></div>'+
+      '<div class="field"><label>Notes</label><textarea id="foodNotes" placeholder="Réaction, texture, quantité…">'+(e.notes||"")+'</textarea></div>'+
+      '<div class="sheet-actions">'+
+        '<button class="btn ghost" id="cancelBtn">Annuler</button>'+
+        '<button class="btn primary" id="saveBtn">Enregistrer</button>'+
+      '</div>',
+      function(){
+        var currentStatus = e.status || "a_tester";
+        var seg = document.getElementById("statusSeg");
+        seg.querySelectorAll(".seg-btn").forEach(function(b){
+          b.addEventListener("click", function(){
+            currentStatus = b.getAttribute("data-status");
+            seg.querySelectorAll(".seg-btn").forEach(function(x){x.className="seg-btn";});
+            var m = FOOD_STATUS[currentStatus];
+            b.className = "seg-btn sel " + (m.cls || "neutral");
+            var dateInput = document.getElementById("foodDate");
+            if(currentStatus!=="a_tester" && !dateInput.value) dateInput.value = todayStr();
+          });
+        });
+        document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+        document.getElementById("saveBtn").addEventListener("click", function(){
+          var date = document.getElementById("foodDate").value;
+          if(currentStatus!=="a_tester" && !date) date = todayStr();
+          state.foods[foodId] = {
+            status: currentStatus,
+            date: currentStatus==="a_tester" ? "" : date,
+            notes: document.getElementById("foodNotes").value.trim(),
+            by: document.getElementById("foodBy").value,
+            updatedAt: nowIso()
+          };
+          saveState(); closeSheet(); renderAll();
+          showToast(fo.name+" mis à jour");
+        });
+      }
+    );
+  }
+
+  function openAllergenSheet(allergenId){
+    var a = ALLERGENS.find(function(x){return x.id===allergenId;});
+    if(!a) return;
+    var e = state.allergens[allergenId] || {status:"a_tester", date:"", notes:""};
+
+    var statusButtons = ALLERGEN_STATUS_ORDER.map(function(k){
+      var m = ALLERGEN_STATUS[k];
+      var sel = (e.status===k);
+      return '<button type="button" class="seg-btn'+(sel?' sel '+(m.cls||'neutral'):'')+'" data-status="'+k+'">'+(m.emoji?m.emoji+' ':'')+m.label+'</button>';
+    }).join("");
+
+    openSheet(
+      '<div class="sheet-title"><span class="em">'+a.emoji+'</span><h2>'+a.name+'</h2></div>'+
+      '<p class="sheet-sub">Aliments typiques : '+a.foods.join(", ")+'</p>'+
+      '<a class="btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:16px;" href="'+beabaUrl(ALLERGEN_MIN_AGE)+'" target="_blank" rel="noopener">💡 Idées de recettes (Béaba)</a>'+
+      '<div class="field"><label>État</label><div class="seg" id="statusSeg">'+statusButtons+'</div></div>'+
+      '<div class="field"><label>Date de 1ère introduction</label><input type="date" id="alDate" value="'+(e.date||"")+'"></div>'+
+      '<div class="field"><label>Notes</label><textarea id="alNotes" placeholder="Symptômes, aliment utilisé…">'+(e.notes||"")+'</textarea></div>'+
+      '<div class="sheet-actions">'+
+        '<button class="btn ghost" id="cancelBtn">Annuler</button>'+
+        '<button class="btn primary" id="saveBtn">Enregistrer</button>'+
+      '</div>',
+      function(){
+        var currentStatus = e.status || "a_tester";
+        var seg = document.getElementById("statusSeg");
+        seg.querySelectorAll(".seg-btn").forEach(function(b){
+          b.addEventListener("click", function(){
+            currentStatus = b.getAttribute("data-status");
+            seg.querySelectorAll(".seg-btn").forEach(function(x){x.className="seg-btn";});
+            var m = ALLERGEN_STATUS[currentStatus];
+            b.className = "seg-btn sel " + (m.cls || "neutral");
+            var dateInput = document.getElementById("alDate");
+            if(currentStatus!=="a_tester" && !dateInput.value) dateInput.value = todayStr();
+          });
+        });
+        document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+        document.getElementById("saveBtn").addEventListener("click", function(){
+          var date = document.getElementById("alDate").value;
+          if(currentStatus!=="a_tester" && !date) date = todayStr();
+          state.allergens[allergenId] = {
+            status: currentStatus,
+            date: currentStatus==="a_tester" ? "" : date,
+            notes: document.getElementById("alNotes").value.trim(),
+            updatedAt: nowIso()
+          };
+          saveState(); closeSheet(); renderAll();
+          showToast(a.name+" mis à jour");
+        });
+      }
+    );
+  }
+
+  function openAddFoodSheet(){
+    var catOptions = CATEGORIES.map(function(c){return '<option value="'+c.id+'">'+c.emoji+' '+c.label+'</option>';}).join("");
+    var allergenChips = ALLERGENS.map(function(a){
+      return '<button type="button" class="chip" data-al="'+a.id+'">'+a.emoji+' '+a.name+'</button>';
+    }).join("");
+
+    openSheet(
+      '<div class="sheet-title"><span class="em">🍽️</span><h2>Ajouter un aliment</h2></div>'+
+      '<div class="field"><label>Nom</label><input type="text" id="newName" placeholder="Ex. Courge butternut"></div>'+
+      '<div class="field"><label>Emoji (optionnel)</label><input type="text" id="newEmoji" placeholder="🍽️" maxlength="4"></div>'+
+      '<div class="field"><label>Catégorie</label><select id="newCat">'+catOptions+'</select></div>'+
+      '<div class="field"><label>Allergènes contenus (optionnel)</label><div class="chip-select" id="newAllergens">'+allergenChips+'</div></div>'+
+      '<div class="sheet-actions">'+
+        '<button class="btn ghost" id="cancelBtn">Annuler</button>'+
+        '<button class="btn primary" id="createBtn">Ajouter</button>'+
+      '</div>',
+      function(){
+        var selected = [];
+        document.getElementById("newAllergens").querySelectorAll(".chip").forEach(function(chip){
+          chip.addEventListener("click", function(){
+            var id = chip.getAttribute("data-al");
+            chip.classList.toggle("active");
+            var idx = selected.indexOf(id);
+            if(idx===-1) selected.push(id); else selected.splice(idx,1);
+          });
+        });
+        document.getElementById("cancelBtn").addEventListener("click", closeSheet);
+        document.getElementById("createBtn").addEventListener("click", function(){
+          var name = document.getElementById("newName").value.trim();
+          if(!name){ showToast("Donnez un nom à l'aliment"); return; }
+          var emoji = document.getElementById("newEmoji").value.trim() || "🍽️";
+          var cat = document.getElementById("newCat").value;
+          var id = "custom_" + normalize(name).replace(/[^a-z0-9]+/g,"_") + "_" + Date.now().toString(36);
+          state.customFoods.push({id:id, name:name, emoji:emoji, cat:cat, allergens:selected, updatedAt: nowIso()});
+          saveState(); closeSheet(); renderAll();
+          showToast(name+" ajouté");
+        });
+      }
+    );
+  }
+
+  function openSettingsSheet(){
+    var ghCfg = ghLoadConfig();
+    openSheet(
+      '<div class="sheet-title"><span class="em">⚙️</span><h2>Réglages</h2></div>'+
+
+      '<div class="settings-section">'+
+        '<h3>Bébé</h3>'+
+        '<div class="field"><label>Prénom</label><input type="text" id="setBabyName" value="'+(state.baby.name||"")+'"></div>'+
+      '</div>'+
+
+      '<div class="settings-section">'+
+        '<h3>Parents</h3>'+
+        '<div class="two-col">'+
+          '<div class="field"><label>Parent 1</label><input type="text" id="setParentA" value="'+(state.parents.a||"")+'"></div>'+
+          '<div class="field"><label>Parent 2</label><input type="text" id="setParentB" value="'+(state.parents.b||"")+'"></div>'+
+        '</div>'+
+      '</div>'+
+
+      '<div class="sheet-actions" style="margin-bottom:22px;">'+
+        '<button class="btn primary" id="saveSettingsBtn">Enregistrer</button>'+
+      '</div>'+
+
+      '<div class="settings-section">'+
+        '<h3>Synchronisation automatique (GitHub)</h3>'+
+        '<p class="sheet-sub" style="margin-top:-4px;">Vos coches sont automatiquement envoyées vers un petit dépôt GitHub privé, et récupérées à intervalle régulier — plus de code à copier. Les deux téléphones doivent utiliser le <strong>même dépôt</strong> et le <strong>même jeton</strong>.</p>'+
+        '<div class="sync-box">'+
+          '<div class="field" style="margin-bottom:10px;"><label>Dépôt (propriétaire/dépôt)</label><input type="text" id="ghRepo" placeholder="ex. jbfoult/premieres-bouchees-data" value="'+(ghCfg.repo||"")+'"></div>'+
+          '<div class="field" style="margin-bottom:0;"><label>Jeton d\'accès (fine-grained, Contents: Read and write)</label><input type="password" id="ghToken" placeholder="github_pat_…" value="'+(ghCfg.token||"")+'"></div>'+
+          '<div class="sync-row" style="margin-top:10px;">'+
+            '<button class="btn primary" id="ghSaveBtn">'+(ghCfg.enabled?"Mettre à jour":"Activer")+'</button>'+
+            (ghCfg.enabled ? '<button class="btn" id="ghSyncNowBtn">Synchroniser maintenant</button>' : '')+
+          '</div>'+
+          (ghCfg.enabled ? '<div class="sync-row"><button class="btn ghost" id="ghDisableBtn" style="color:var(--danger);">Désactiver sur cet appareil</button></div>' : '')+
+          '<p id="ghStatusLine" style="font-size:.78rem;margin:10px 0 0;">'+ghStatusHtml()+'</p>'+
+        '</div>'+
+        '<p class="sheet-sub" style="margin:8px 0 0;">Pas encore de dépôt ? Sur GitHub : créez un dépôt privé en cochant « Add a README file », puis Settings → Developer settings → Fine-grained tokens → générez-en un limité à ce seul dépôt, permission « Contents: Read and write ». Collez le même jeton sur les deux téléphones — il reste stocké uniquement dans le navigateur de chaque appareil, jamais envoyé ailleurs.</p>'+
+      '</div>'+
+
+      '<div class="settings-section">'+
+        '<h3>Sauvegarde manuelle (secours)</h3>'+
+        '<p class="sheet-sub" style="margin-top:-4px;">Sans GitHub configuré, vous pouvez toujours transférer vos données une fois via un code à copier-coller ou partager.</p>'+
+        '<div class="sync-box">'+
+          '<label style="font-size:.75rem;font-weight:700;color:var(--ink-soft);">1. Envoyer mes données</label>'+
+          '<div class="sync-row">'+
+            '<button class="btn" id="genCodeBtn">Générer le code</button>'+
+            '<button class="btn primary" id="shareCodeBtn" hidden>Partager</button>'+
+          '</div>'+
+          '<textarea id="codeOut" readonly hidden style="margin-top:8px;"></textarea>'+
+        '</div>'+
+        '<div class="sync-box" style="margin-top:10px;">'+
+          '<label style="font-size:.75rem;font-weight:700;color:var(--ink-soft);">2. Recevoir des données</label>'+
+          '<textarea id="codeIn" placeholder="Collez ici le code reçu…" style="margin-top:8px;"></textarea>'+
+          '<div class="sync-row"><button class="btn primary" id="mergeBtn">Fusionner</button></div>'+
+        '</div>'+
+      '</div>'+
+
+      '<div class="settings-section">'+
+        '<h3>Données</h3>'+
+        '<button class="btn danger-outline" id="resetBtn" style="width:100%;">Réinitialiser toutes les données</button>'+
+      '</div>',
+      function(){
+        document.getElementById("saveSettingsBtn").addEventListener("click", function(){
+          state.baby.name = document.getElementById("setBabyName").value.trim();
+          state.parents.a = document.getElementById("setParentA").value.trim() || "Parent 1";
+          state.parents.b = document.getElementById("setParentB").value.trim() || "Parent 2";
+          saveState(); renderAll();
+          showToast("Réglages enregistrés");
+        });
+
+        document.getElementById("ghSaveBtn").addEventListener("click", function(){
+          var repo = document.getElementById("ghRepo").value.trim();
+          var token = document.getElementById("ghToken").value.trim();
+          if(!repo || !repo.includes("/")){ showToast("Format attendu : propriétaire/dépôt"); return; }
+          if(!token){ showToast("Collez votre jeton d'accès"); return; }
+          ghSaveConfig({repo:repo, token:token, enabled:true});
+          showToast("Synchronisation activée");
+          runGhSync().then(function(){ openSettingsSheet(); });
+        });
+        var syncNowBtn = document.getElementById("ghSyncNowBtn");
+        if(syncNowBtn) syncNowBtn.addEventListener("click", function(){
+          runGhSync().then(function(){
+            var el = document.getElementById("ghStatusLine");
+            if(el) el.innerHTML = ghStatusHtml();
+          });
+        });
+        var disableBtn = document.getElementById("ghDisableBtn");
+        if(disableBtn) disableBtn.addEventListener("click", function(){
+          if(confirm("Désactiver la synchronisation automatique sur cet appareil ? Le dépôt GitHub n'est pas supprimé.")){
+            var cfg = ghLoadConfig();
+            cfg.enabled = false;
+            ghSaveConfig(cfg);
+            showToast("Synchronisation désactivée");
+            openSettingsSheet();
+          }
+        });
+
+        document.getElementById("genCodeBtn").addEventListener("click", function(){
+          var code = exportCode();
+          var out = document.getElementById("codeOut");
+          out.hidden = false; out.value = code;
+          document.getElementById("shareCodeBtn").hidden = !navigator.share;
+          if(navigator.clipboard){
+            navigator.clipboard.writeText(code).then(function(){ showToast("Code copié dans le presse-papiers"); });
+          }
+        });
+        document.getElementById("shareCodeBtn").addEventListener("click", function(){
+          var code = document.getElementById("codeOut").value;
+          if(navigator.share){
+            navigator.share({title:"Premières Bouchées", text: code}).catch(function(){});
+          }
+        });
+        document.getElementById("mergeBtn").addEventListener("click", function(){
+          var raw = document.getElementById("codeIn").value.trim();
+          if(!raw){ showToast("Collez un code d'abord"); return; }
+          var res = importCode(raw);
+          if(res.ok){
+            saveState(); renderAll();
+            showToast(res.count+" entrée(s) synchronisée(s)");
+            closeSheet();
+          } else {
+            showToast("Code invalide");
+          }
+        });
+
+        document.getElementById("resetBtn").addEventListener("click", function(){
+          if(confirm("Effacer toutes les données de suivi sur cet appareil ? Cette action est irréversible.")){
+            state = defaultState();
+            saveState(); renderAll(); closeSheet();
+            showToast("Données réinitialisées");
+          }
+        });
+      }
+    );
+  }
+
+  /* ================= SYNC — helpers partagés ================= */
+  function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64decode(str){ return decodeURIComponent(escape(atob(str))); }
+
+  function buildPayload(){
+    return {
+      v:2,
+      foods: state.foods,
+      allergens: state.allergens,
+      customFoods: state.customFoods,
+      baby: state.baby,
+      parents: state.parents,
+      exportedAt: nowIso()
+    };
+  }
+
+  // Fusionne des données reçues (code manuel ou GitHub) dans l'état local :
+  // pour chaque entrée, on garde toujours la plus récente (updatedAt).
+  function mergeIncoming(data){
+    if(!data || typeof data!=="object") return 0;
+    var count = 0;
+
+    Object.keys(data.foods||{}).forEach(function(id){
+      var incoming = data.foods[id];
+      var local = state.foods[id];
+      if(!local || (incoming.updatedAt||"") > (local.updatedAt||"")){
+        state.foods[id] = incoming; count++;
+      }
+    });
+
+    Object.keys(data.allergens||{}).forEach(function(id){
+      var incoming = data.allergens[id];
+      var local = state.allergens[id];
+      if(!local || (incoming.updatedAt||"") > (local.updatedAt||"")){
+        state.allergens[id] = incoming; count++;
+      }
+    });
+
+    (data.customFoods||[]).forEach(function(cf){
+      var idx = state.customFoods.findIndex(function(x){return x.id===cf.id;});
+      if(idx===-1){ state.customFoods.push(cf); count++; }
+      else if((cf.updatedAt||"") > (state.customFoods[idx].updatedAt||"")){ state.customFoods[idx]=cf; count++; }
+    });
+
+    if(data.baby){
+      if(!state.baby.name && data.baby.name) state.baby.name = data.baby.name;
+    }
+    if(data.parents){
+      if((!state.parents.a || state.parents.a==="Maman") && data.parents.a) state.parents.a = data.parents.a;
+      if((!state.parents.b || state.parents.b==="Papa") && data.parents.b) state.parents.b = data.parents.b;
+    }
+
+    return count;
+  }
+
+  /* ---------- Sauvegarde manuelle (code) ---------- */
+  function exportCode(){ return b64encode(JSON.stringify(buildPayload())); }
+
+  function importCode(code){
+    var data;
+    try{ data = JSON.parse(b64decode(code.trim())); }catch(e){ return {ok:false}; }
+    if(!data || typeof data!=="object") return {ok:false};
+    return {ok:true, count: mergeIncoming(data)};
+  }
+
+  /* ---------- Synchronisation automatique (GitHub) ---------- */
+  var GH_KEY = "pb_gh_v1";
+  var GH_PATH = "data.json";
+  var ghSyncTimer = null;
+  var ghStatus = {state:"idle", message:"", lastSyncAt:""}; // idle | syncing | ok | error
+
+  function ghLoadConfig(){
+    try{
+      var raw = localStorage.getItem(GH_KEY);
+      return raw ? JSON.parse(raw) : {repo:"", token:"", enabled:false};
+    }catch(e){ return {repo:"", token:"", enabled:false}; }
+  }
+  function ghSaveConfig(cfg){
+    try{ localStorage.setItem(GH_KEY, JSON.stringify(cfg)); }catch(e){}
+  }
+
+  function ghHeaders(token){
+    return {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Content-Type": "application/json"
+    };
+  }
+
+  function ghFileUrl(repo){
+    return "https://api.github.com/repos/" + repo + "/contents/" + GH_PATH;
+  }
+
+  // Récupère le fichier distant : {content, sha} ou {content:null, sha:null} s'il n'existe pas encore.
+  function ghGetFile(cfg){
+    return fetch(ghFileUrl(cfg.repo), {headers: ghHeaders(cfg.token)}).then(function(res){
+      if(res.status===404) return {content:null, sha:null};
+      if(!res.ok) return res.json().catch(function(){return {};}).then(function(body){
+        throw new Error(ghErrorMessage(res.status, body));
+      });
+      return res.json().then(function(json){
+        var raw = (json.content||"").replace(/\n/g,"");
+        var data = null;
+        try{ data = JSON.parse(b64decode(raw)); }catch(e){ data = null; }
+        return {content:data, sha:json.sha};
+      });
+    });
+  }
+
+  function ghPutFile(cfg, dataObj, sha){
+    var body = {
+      message: "Synchro Premières Bouchées",
+      content: b64encode(JSON.stringify(dataObj))
+    };
+    if(sha) body.sha = sha;
+    return fetch(ghFileUrl(cfg.repo), {method:"PUT", headers: ghHeaders(cfg.token), body: JSON.stringify(body)})
+      .then(function(res){
+        if(res.status===409) return "conflict";
+        if(!res.ok) return res.json().catch(function(){return {};}).then(function(errBody){
+          throw new Error(ghErrorMessage(res.status, errBody));
+        });
+        return "ok";
+      });
+  }
+
+  function ghErrorMessage(status, body){
+    if(status===401) return "Jeton invalide ou expiré.";
+    if(status===403) return "Accès refusé (permissions du jeton ou limite atteinte).";
+    if(status===404) return "Dépôt introuvable — vérifiez le nom (propriétaire/dépôt).";
+    if(status===422) return "Le dépôt est vide (ajoutez un fichier README pour l'initialiser) ou requête invalide.";
+    return (body && body.message) ? body.message : ("Erreur GitHub (" + status + ")");
+  }
+
+  function setGhStatus(state, message){
+    ghStatus.state = state;
+    ghStatus.message = message || "";
+    if(state==="ok") ghStatus.lastSyncAt = nowIso();
+    var el = document.getElementById("ghStatusLine");
+    if(el) el.innerHTML = ghStatusHtml();
+  }
+
+  function ghStatusHtml(){
+    if(ghStatus.state==="syncing") return "⏳ Synchronisation…";
+    if(ghStatus.state==="error") return '<span style="color:var(--danger);">⚠️ '+ghStatus.message+'</span>';
+    if(ghStatus.state==="ok" && ghStatus.lastSyncAt){
+      var d = new Date(ghStatus.lastSyncAt);
+      var hh = String(d.getHours()).padStart(2,"0"), mm = String(d.getMinutes()).padStart(2,"0");
+      return '<span style="color:var(--ok);">✓ Synchronisé à '+hh+':'+mm+'</span>';
+    }
+    return "Pas encore synchronisé";
+  }
+
+  // Un cycle complet : on récupère le distant, on fusionne dans le local, puis on renvoie
+  // l'état fusionné au distant (avec une reprise si le fichier a changé entre-temps).
+  // Empreinte du contenu suivi (hors horodatage d'export) : sert à éviter de renvoyer
+  // un commit GitHub identique à chaque cycle quand rien n'a réellement changé.
+  var lastPushedFingerprint = null;
+  function payloadFingerprint(){
+    return JSON.stringify({foods:state.foods, allergens:state.allergens, customFoods:state.customFoods, baby:state.baby, parents:state.parents});
+  }
+
+  function runGhSync(){
+    var cfg = ghLoadConfig();
+    if(!cfg.enabled || !cfg.repo || !cfg.token) return Promise.resolve();
+    setGhStatus("syncing");
+    return ghGetFile(cfg).then(function(remote){
+      if(remote.content) mergeIncoming(remote.content);
+      saveStateLocalOnly();
+      renderAll();
+      var fp = payloadFingerprint();
+      if(fp === lastPushedFingerprint && remote.sha){
+        return "skip";
+      }
+      return ghPutFile(cfg, buildPayload(), remote.sha).then(function(result){
+        if(result==="conflict"){
+          return ghGetFile(cfg).then(function(remote2){
+            if(remote2.content) mergeIncoming(remote2.content);
+            saveStateLocalOnly();
+            renderAll();
+            var fp2 = payloadFingerprint();
+            return ghPutFile(cfg, buildPayload(), remote2.sha).then(function(r2){
+              if(r2==="ok") lastPushedFingerprint = fp2;
+              return r2;
+            });
+          });
+        }
+        if(result==="ok") lastPushedFingerprint = fp;
+        return result;
+      });
+    }).then(function(){
+      setGhStatus("ok");
+    }).catch(function(err){
+      setGhStatus("error", err.message || "Erreur de synchronisation");
+    });
+  }
+
+  function scheduleGhSync(){
+    var cfg = ghLoadConfig();
+    if(!cfg.enabled) return;
+    clearTimeout(ghSyncTimer);
+    ghSyncTimer = setTimeout(runGhSync, 1500);
+  }
+
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) scheduleGhSync();
+  });
+  setInterval(function(){
+    if(!document.hidden) scheduleGhSync();
+  }, 25000);
+
+  /* ================= TOAST ================= */
+  var toastTimer;
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.hidden = true; }, 2200);
+  }
+
+  /* ================= TABS ================= */
+  document.querySelectorAll(".tab").forEach(function(tab){
+    tab.addEventListener("click", function(){
+      document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("active"); t.setAttribute("aria-selected","false"); });
+      tab.classList.add("active"); tab.setAttribute("aria-selected","true");
+      var view = tab.getAttribute("data-view");
+      document.getElementById("view-foods").hidden = view!=="foods";
+      document.getElementById("view-allergens").hidden = view!=="allergens";
+    });
+  });
+
+  /* ================= WIRE UP ================= */
+  document.getElementById("searchInput").addEventListener("input", function(e){
+    state.ui.search = e.target.value; renderFoods();
+  });
+  document.getElementById("settingsBtn").addEventListener("click", openSettingsSheet);
+  document.getElementById("addFoodBtn").addEventListener("click", openAddFoodSheet);
+  document.getElementById("reactionBanner").addEventListener("click", function(){
+    var st = computeStats();
+    if(st.foodReactions>0){
+      state.ui.filter = "reaction"; saveState();
+      document.querySelector('.tab[data-view="foods"]').click();
+      renderFoods();
+    } else {
+      document.querySelector('.tab[data-view="allergens"]').click();
+    }
+  });
+
+  function renderAll(){
+    renderHeader();
+    renderStatusFilters();
+    renderFoods();
+    renderAllergens();
+  }
+
+  renderAll();
+  if(ghLoadConfig().enabled) runGhSync();
+})();
+</script>
