@@ -717,7 +717,7 @@
       b.className = "chip" + (state.ui.filter===sf.id ? " active":"");
       b.textContent = sf.label;
       b.addEventListener("click", function(){
-        state.ui.filter = sf.id; saveState(); renderFoods();
+        state.ui.filter = sf.id; saveState(); renderStatusFilters(); renderFoods();
       });
       wrap.appendChild(b);
     });
@@ -1268,9 +1268,16 @@
     pushTimer = setTimeout(pushToFamily, 800);
   }
 
+  // Rattache le compte connecté à un code de famille, pour qu'une future connexion
+  // (même sur un autre appareil) retrouve la famille sans redemander le code.
+  function userDocRef(){ return db.collection("users").doc(auth.currentUser.uid); }
+  function linkAccountToFamily(code){ return userDocRef().set({familyCode: code}); }
+
   function createFamily(){
     var code = generateFamilyCode();
     return familyDocRef(code).set(buildPayload()).then(function(){
+      return linkAccountToFamily(code);
+    }).then(function(){
       setFamilyCodeLocal(code);
       lastPushedFingerprint = payloadFingerprint();
       connectToFamily(code);
@@ -1288,6 +1295,8 @@
       setFamilyCodeLocal(code);
       lastPushedFingerprint = payloadFingerprint();
       return familyDocRef(code).set(buildPayload()).then(function(){
+        return linkAccountToFamily(code);
+      }).then(function(){
         connectToFamily(code);
         return code;
       });
@@ -1334,7 +1343,7 @@
     if(st.foodReactions>0){
       state.ui.filter = "reaction"; saveState();
       document.querySelector('.tab[data-view="foods"]').click();
-      renderFoods();
+      renderStatusFilters(); renderFoods();
     } else {
       document.querySelector('.tab[data-view="allergens"]').click();
     }
@@ -1451,14 +1460,29 @@
       return;
     }
     var code = familyCode();
-    if(!code){
-      renderFamilyChoice();
-      showGate();
+    if(code){
+      connectToFamily(code);
+      renderAll();
+      showApp();
       return;
     }
-    connectToFamily(code);
-    renderAll();
-    showApp();
+    // Pas de code mémorisé sur cet appareil : on vérifie si ce compte est déjà
+    // rattaché à une famille (créée/rejointe depuis un autre appareil).
+    authGateContent.innerHTML = '<p class="auth-loading">Chargement…</p>';
+    showGate();
+    userDocRef().get().then(function(snap){
+      var remoteCode = snap.exists && snap.data().familyCode;
+      if(remoteCode){
+        setFamilyCodeLocal(remoteCode);
+        connectToFamily(remoteCode);
+        renderAll();
+        showApp();
+      } else {
+        renderFamilyChoice();
+      }
+    }).catch(function(){
+      renderFamilyChoice();
+    });
   });
 })();
 </script>
